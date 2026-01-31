@@ -21,7 +21,9 @@ _By Tove, Grace, and Miles for UVicHacks × Inspire Hackathon_
 
 **https://www.figma.com/make/Q624d9en4gGKReWEc6orrr/Community-Meal-Planning-Website?t=MC7L4tn4UlMeYDQt-1**
 
+### Powerpoint Presentation:
 
+**https://uvic-my.sharepoint.com/:p:/g/personal/gracepk_uvic_ca/IQBktUkaLqgyRYyFijBvanccAYJnbiSXy47edZAiOSQdD4w?e=EzMRWt**
 
 ### Demo Accounts (password: `demo1234`)
 | Email | Username |
