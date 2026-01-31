@@ -1,0 +1,94 @@
+# Cloud Build configuration for FoodShare
+# SQLite + single-instance Cloud Run
+
+steps:
+  # -----------------------
+  # Build & deploy backend
+  # -----------------------
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - build
+      - -t
+      - gcr.io/$PROJECT_ID/foodshare-api
+      - -f
+      - backend/Dockerfile.cloudrun
+      - backend
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - push
+      - gcr.io/$PROJECT_ID/foodshare-api
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - foodshare-api
+      - --image=gcr.io/$PROJECT_ID/foodshare-api
+      - --region=us-central1
+      - --platform=managed
+      - --allow-unauthenticated
+      - --memory=512Mi
+      - --cpu=1
+      - --concurrency=1
+      - --max-instances=1
+      - --set-env-vars
+      - DATABASE_URL=sqlite+aiosqlite:////tmp/foodshare.db,SECRET_KEY=${_SECRET_KEY},SEED_DATA=true
+
+  # --------------------------------
+  # Fetch backend URL for frontend
+  # --------------------------------
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'get-backend-url'
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        gcloud run services describe foodshare-api \
+          --region us-central1 \
+          --format='value(status.url)' > /workspace/backend_url.txt
+
+  # ------------------------
+  # Build & deploy frontend
+  # ------------------------
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        BACKEND_URL=$$(cat /workspace/backend_url.txt)
+        # Ensure https (Cloud Run URLs should always be https)
+        BACKEND_URL=$$(echo "$$BACKEND_URL" | sed 's|^http://|https://|')
+        echo "Backend URL: $$BACKEND_URL"
+        docker build --no-cache -t gcr.io/$PROJECT_ID/foodshare-web \
+          -f frontend/Dockerfile.cloudrun \
+          --build-arg VITE_API_URL="$$BACKEND_URL/api" \
+          frontend
+
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - push
+      - gcr.io/$PROJECT_ID/foodshare-web
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - foodshare-web
+      - --image=gcr.io/$PROJECT_ID/foodshare-web
+      - --region=us-central1
+      - --platform=managed
+      - --allow-unauthenticated
+      - --memory=256Mi
+      - --cpu=1
+      - --concurrency=80
+
+images:
+  - gcr.io/$PROJECT_ID/foodshare-api
+  - gcr.io/$PROJECT_ID/foodshare-web
+
+substitutions:
+  _SECRET_KEY: 'SUPER_SUPER_SUPER_SECRET_KEY'
