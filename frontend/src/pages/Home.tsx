@@ -13,7 +13,7 @@ export default function Home() {
             FoodShare
           </h1>
           <p className="text-xl text-primary-100 mb-8">
-            Dinner parties with people you trust. No flakes, no strangers.
+            Community Cooking to fight food waste. Invite-only local meals where everyone pitches in.
           </p>
           <div className="flex justify-center gap-3">
             {isAuthenticated ? (

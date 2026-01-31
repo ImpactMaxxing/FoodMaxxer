@@ -13,6 +13,16 @@ _By Tove, Grace, and Miles for UVicHacks × Inspire Hackathon_
 
 **https://foodshare-web-287947527018.us-central1.run.app**
 
+### Backend Documentation:
+
+**https://foodshare-api-287947527018.us-central1.run.app/docs#/**
+
+### Figma Design:
+
+**https://www.figma.com/make/Q624d9en4gGKReWEc6orrr/Community-Meal-Planning-Website?t=MC7L4tn4UlMeYDQt-1**
+
+
+
 ### Demo Accounts (password: `demo1234`)
 | Email | Username |
 |-------|----------|
